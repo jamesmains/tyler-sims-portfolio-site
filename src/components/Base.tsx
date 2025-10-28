@@ -1,53 +1,19 @@
-import {
-  ActionIcon,
-  useMantineColorScheme,
-  useComputedColorScheme,
-  Box,
-  Group,
-  Container,
-} from "@mantine/core";
-import { IconSun, IconMoon } from "@tabler/icons-react";
+import { Box, Group, Container } from "@mantine/core";
 import { NavActionsMenu } from "./NavActionsMenu";
 import { NavActionsMenuMobile } from "./NavActionsMenuMobile";
+import { ColorSchemeButton } from "./ColorSchemeButton";
 
 export function Base() {
-  const { setColorScheme } = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme("light", {
-    getInitialValueInEffect: true,
-  });
-
-  return (<Container size="lg">
-        <Group justify="center" align="center">
-
-          {/* Navigation */}
-          <Group align="center" gap="sm">
-            <Box hiddenFrom="sm">
-              <NavActionsMenuMobile />
-            </Box>
-
-            <Box visibleFrom="sm">
-              <NavActionsMenu />
-            </Box>
-
-            <ActionIcon
-              onClick={() => setColorScheme(
-                computedColorScheme === "light" ? "dark" : "light"
-              )}
-              variant="light"
-              color={computedColorScheme === "light" ? "blue" : "yellow"}
-              radius="xl"
-              size="lg"
-              aria-label="Toggle color scheme"
-            >
-              {computedColorScheme === "dark" ? (
-                <IconSun size={18} />
-              ) : (
-                <IconMoon size={18} />
-              )}
-            </ActionIcon>
-          </Group>
-        </Group>
-        
-      </Container>
+  return (
+    <Container size="lg">
+      <Group justify="right" align="right" hiddenFrom="sm">
+        <ColorSchemeButton />
+        <NavActionsMenuMobile />
+      </Group>
+      <Group justify="center" align="center" visibleFrom="sm">
+        <NavActionsMenu />
+        <ColorSchemeButton />
+      </Group>
+    </Container>
   );
 }

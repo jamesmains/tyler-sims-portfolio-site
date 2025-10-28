@@ -42,7 +42,7 @@ const HomePage = () => {
             combining clean design with strong engineering principles.
           </Text>
         {/* Links */}
-        <Group __size="md">
+        <Group __size="md" align="center" justify="center">
             <Button
             component="a"
             href="/projects-listing"

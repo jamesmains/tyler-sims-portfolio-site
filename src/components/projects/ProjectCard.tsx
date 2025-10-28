@@ -1,7 +1,7 @@
 import { Card, Image, Text, Transition } from "@mantine/core";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { type Project } from "../../types";
+import { type Project } from "../../../types";
 
 export function ProjectCard({ project }: { project: Project }) {
   const [hovered, setHovered] = useState(false);

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Text, Group, SimpleGrid, Loader, Pagination, Box } from "@mantine/core";
-import { useProjectsQuery } from "../api/projects";
-import { PageTitle } from "./PageTitle";
+import { useProjectsQuery } from "../../api/projects";
+import { PageTitle } from "../PageTitle";
 import { ProjectCard } from "./ProjectCard";
 
 export function ProjectsList() {
