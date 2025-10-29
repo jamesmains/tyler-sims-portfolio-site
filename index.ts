@@ -23,12 +23,11 @@ const SESSION_LIFETIME_MS = 3600 * 1000;
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 
 // --- Path Definitions ---
-const FRONTEND_ASSETS_DIR = path.join(import.meta.dir, "../../apps/web/dist");
+const FRONTEND_ASSETS_DIR = path.join(import.meta.dir, "/dist");
 const INDEX_HTML_PATH = path.join(FRONTEND_ASSETS_DIR, "index.html");
 const ASSETS_SUBDIR_PATH = path.join(FRONTEND_ASSETS_DIR, "/assets");
 const UPLOADS_PATH = path.join(import.meta.dir,"/uploads");
 
-// Todo: Fix so the local machine can still run this
 const dbFile = `${import.meta.dir}/db/db.sqlite`;
 let sqlite: Database;
 let db = drizzle({ schema: { projects, activeSessions } });
@@ -456,7 +455,8 @@ const app = new Elysia()
           }
 
           // Use timestamp to avoid collisions
-          const filename = `${Date.now()}_${file.name}`;
+
+          const filename = `${Date.now()}_${file.name.replace(/\s/g, "-")}`;
           const filepath = path.join(uploadDir, filename);
 
           // Write the file to disk
