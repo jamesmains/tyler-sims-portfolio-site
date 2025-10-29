@@ -8,6 +8,8 @@ import {
   Title,
   Divider,
   Space,
+  Flex,
+  Box,
 } from "@mantine/core";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { type Project } from "../../../types";
@@ -66,39 +68,46 @@ export function ProjectFileUpload({
       <Divider size="sm" />
       <Space h="xs" />
 
-      <Dropzone
-        onDrop={handleUpload}
-        accept={IMAGE_MIME_TYPE}
-        maxFiles={maxImages}
-        multiple={fieldName === "gallery"}
-      >
-        <Group justify="center" gap="md" mih={100}>
-          <Dropzone.Accept>
-            <IconUpload size={32} />
-          </Dropzone.Accept>
-          <Dropzone.Reject>
-            <IconX size={32} color="red" />
-          </Dropzone.Reject>
-          <Dropzone.Idle>
-            <IconPhoto size={32} />
-            <Text>Drag image here or click to upload</Text>
-          </Dropzone.Idle>
-        </Group>
-      </Dropzone>
-
+      {((fieldName === "showcase" && project.showcase.length === 0)
+        || (fieldName === "gallery" && project.gallery.length < maxImages))
+        && (
+          <Dropzone
+            onDrop={handleUpload}
+            accept={IMAGE_MIME_TYPE}
+            maxFiles={maxImages}
+            multiple={fieldName === "gallery"}
+          >
+            <Group justify="center" gap="md" mih={100}>
+              <Dropzone.Accept>
+                <IconUpload size={32} />
+              </Dropzone.Accept>
+              <Dropzone.Reject>
+                <IconX size={32} color="red" />
+              </Dropzone.Reject>
+              <Dropzone.Idle>
+                <IconPhoto size={32} />
+                <Text>Drag image here or click to upload</Text>
+              </Dropzone.Idle>
+            </Group>
+          </Dropzone>
+        )}
       {/* Image previews */}
       {fieldName === "showcase" && project.showcase && (
-        <div style={{ marginTop: "1rem" }}>
-          <Image
-            src={project.showcase}
-            alt="Showcase"
-            radius="md"
-            fit="cover"
-          />
+        <Box align="center">
+          <Group justify="center">
+            <Image
+              src={project.showcase}
+              alt="Showcase"
+              radius="md"
+              fit="cover"
+              h="200"
+              w="200"
+            />
+          </Group>
           <Button mt="xs" color="red" onClick={() => handleRemove("showcase")}>
             Remove
           </Button>
-        </div>
+        </Box>
       )}
 
       {fieldName === "gallery" && files.length > 0 && (
