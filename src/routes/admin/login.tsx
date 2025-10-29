@@ -1,8 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AdminLogin } from "../../components/admin/AdminLogin";
 import { checkSessionStatus } from "../../api/projects";
+import { useDocumentTitle } from '@mantine/hooks';
 
 export const AdminLoginComponent = () => {
+  useDocumentTitle("Admin Login")
     return(
         <AdminLogin/>
     )

@@ -2,9 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { fetchSingleProject } from "../../api/projects";
 import type { Project } from "../../../types";
 import { ProjectDetails } from "../../components/projects/ProjectDetails";
+import { useDocumentTitle } from '@mantine/hooks';
 
 function ProjectPage(){
       const project = Route.useLoaderData() as Project;
+      useDocumentTitle(`${project.title}`);
       return (
         <><ProjectDetails project={project}/></>);
 }

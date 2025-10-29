@@ -27,6 +27,7 @@ import {
 } from "@mantine/core";
 import { IconFileTypeHtml, IconLetterCase } from "@tabler/icons-react";
 import { ProjectFileUpload } from "./ProjectFileUpload";
+import { check } from "drizzle-orm/gel-core";
 
 type Props = {
   project: Project;
@@ -56,6 +57,22 @@ export function ProjectForm({ project: initialProject }: Props) {
     await navigate({ to: "/admin/dashboard" });
   };
 
+  const handlePublishAndSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    project.isPublished = true;
+    mutation.mutate(project);
+    await navigate({ to: `/admin/manage/${project.id}`, replace: true });
+    await navigate({ to: "/admin/dashboard" });
+  }
+
+  const handleDraftAndSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    project.isPublished = false;
+    mutation.mutate(project);
+    await navigate({ to: `/admin/manage/${project.id}`, replace: true });
+    await navigate({ to: "/admin/dashboard" });
+  }
+
   return (
     <Paper
       shadow="sm"
@@ -68,7 +85,7 @@ export function ProjectForm({ project: initialProject }: Props) {
         {initialProject.id ? "Edit Project" : "Create Project"}
       </Title>
 
-      <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-6">
         {/* Title */}
         <TextInput
           label="Project Title"
@@ -270,13 +287,15 @@ export function ProjectForm({ project: initialProject }: Props) {
             })}
           </Group>
         </Box>
-
+        <Space h="xs" />
         {/* Action Buttons */}
         <Group mt="xl">
           <Button variant="default" component={Link} to="/admin/dashboard">
             Cancel
           </Button>
-          <Button type="submit">Save Project</Button>
+          <Button color="blue" onClick={handleSubmit}>Save</Button>
+          <Button color="yellow" onClick={handleDraftAndSubmit}>Save as Draft</Button>
+          <Button color="green" onClick={handlePublishAndSubmit}>Save and Publish</Button>
         </Group>
       </form>
     </Paper>

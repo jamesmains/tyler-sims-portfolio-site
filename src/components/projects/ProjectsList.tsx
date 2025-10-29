@@ -18,7 +18,8 @@ export function ProjectsList() {
 
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
         {projects.map((p) => (
-          <ProjectCard key={p.id} project={p} />
+          p.isPublished && (
+          <ProjectCard key={p.id} project={p} />)
         ))}
       </SimpleGrid>
 

@@ -3,10 +3,14 @@ import type { Project } from '../../../../types';
 import { ProjectForm } from '../../../components/admin/ProjectForm';
 import { AdminBase } from '../../../components/admin/AdminBase';
 import { checkSessionStatus, fetchSingleProject } from '../../../api/projects';
+import { useDocumentTitle } from '@mantine/hooks';
 import { Space } from '@mantine/core';
 
 function EditProjectPage() {
   const project = Route.useLoaderData() as Project;
+  let projectStateText = project.id === undefined ? "New Project" : "Editing Project"
+  let publishStateText = project.isPublished ? "Published" : "Draft";
+  useDocumentTitle(`${projectStateText} | ${publishStateText}`);
   return (
     <><AdminBase /><ProjectForm project={project} /><Space h="xs" /></>);
 }
@@ -14,7 +18,7 @@ function EditProjectPage() {
 export const Route = createFileRoute("/admin/manage/$projectId")({
   // Loader handles both editing existing projects and creating new ones
   loader: async ( { params }) => {
-
+    
     const isSessionValid = await checkSessionStatus();
     const { projectId } = params;
     if (!isSessionValid) {
@@ -32,6 +36,7 @@ export const Route = createFileRoute("/admin/manage/$projectId")({
         showcase: "",
         gallery: [],
         tech: [],
+        isPublished: false,
       };
       return newProject;
     }
@@ -44,3 +49,4 @@ export const Route = createFileRoute("/admin/manage/$projectId")({
   // Render component using loader data
   component: EditProjectPage,
 });
+

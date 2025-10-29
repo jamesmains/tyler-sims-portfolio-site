@@ -14,7 +14,10 @@ import {
   IconBrandLinkedin,
   IconMail,
 } from "@tabler/icons-react";
+import { useDocumentTitle } from '@mantine/hooks';
+
 const HomePage = () => {
+  useDocumentTitle("Home");
   return (
     <Container size="md" py="sm">
       <Stack

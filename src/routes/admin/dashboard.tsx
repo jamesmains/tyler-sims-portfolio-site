@@ -2,8 +2,10 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AdminProjectsList } from "../../components/admin/AdminProjectsList";
 import { AdminBase } from "../../components/admin/AdminBase";
 import { checkSessionStatus } from "../../api/projects";
+import { useDocumentTitle } from '@mantine/hooks';
 
 export function AdminDashboard() {
+useDocumentTitle("Admin Dashboard");
   return(
     <>
     <AdminBase />

@@ -394,6 +394,7 @@ const app = new Elysia()
               bodyContent: content.bodyContent, // Use the actual value from the body
               gallery: content.gallery, // Save the stringified JSON
               tech: content.tech,
+              isPublished : content.isPublished
             })
             .where(eq(projects.id, content.id))
             .returning();
@@ -503,7 +504,7 @@ const app = new Elysia()
   .listen(
   {
     port: Number(process.env.PORT) || 3000,
-    host: "0.0.0.0",
+    hostname: "0.0.0.0",
   },
   () => {
     console.log("Combined Server running on " + process.env.BASE_URL);

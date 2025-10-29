@@ -27,6 +27,7 @@ export type Project = {
     showcase: string;           // Filepath for the main image for this project
     gallery: GalleryImage[];    // Custom type that needs to be read from json upon loading
     tech: string[];             // Will be turned into a json string upon saving and read from json upon loading
+    isPublished: boolean;       // Determines if this project is viewable by the public projects listing page
 }
 
 export type Tech = {
