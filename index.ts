@@ -30,7 +30,7 @@ const UPLOADS_PATH = path.join(import.meta.dir,"/uploads");
 
 const dbFile = `${import.meta.dir}/db/db.sqlite`;
 let sqlite: Database;
-let db = drizzle({ schema: { projects, activeSessions } });
+let db = drizzle({ schema: { projects, activeSessions, projectImages } });
 
 // --- UTILITY FUNCTIONS ---
 
@@ -146,33 +146,33 @@ try {
   db = drizzle(sqlite, { schema: { projects, activeSessions, projectImages } });
 
   // Create tables if they don't exist (using raw SQL for Bun SQLite setup)
-  sqlite.run(
-    `CREATE TABLE IF NOT EXISTS projects (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
-            description TEXT,
-            body_content TEXT, 
-            showcase TEXT,
-            gallery TEXT,
-            tech TEXT 
-        );`
-  );
+  // sqlite.run(
+  //   `CREATE TABLE IF NOT EXISTS projects (
+  //           id INTEGER PRIMARY KEY AUTOINCREMENT,
+  //           title TEXT,
+  //           description TEXT,
+  //           body_content TEXT, 
+  //           showcase TEXT,
+  //           gallery TEXT,
+  //           tech TEXT 
+  //       );`
+  // );
 
-  sqlite.run(
-    `CREATE TABLE IF NOT EXISTS activeSessions (
-            session_id TEXT PRIMARY KEY,
-            createdAt INTEGER
-        );`
-  );
+  // sqlite.run(
+  //   `CREATE TABLE IF NOT EXISTS activeSessions (
+  //           session_id TEXT PRIMARY KEY,
+  //           createdAt INTEGER
+  //       );`
+  // );
 
-  sqlite.run(
-    `CREATE TABLE IF NOT EXISTS projectImages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            project_id INTEGER,
-            url TEXT,
-            alt TEXT
-          );`
-  )
+  // sqlite.run(
+  //   `CREATE TABLE IF NOT EXISTS projectImages (
+  //           id INTEGER PRIMARY KEY AUTOINCREMENT,
+  //           project_id INTEGER,
+  //           url TEXT,
+  //           alt TEXT
+  //         );`
+  // )
 
 } catch (e) {
   console.error("🛑 FATAL DATABASE STARTUP ERROR. CHECK PATH/PERMISSIONS:", e);

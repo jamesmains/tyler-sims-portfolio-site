@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e89b39c6-95f5-4626-9aef-2ae77ca59f01",
-  "prevId": "645b3440-e00c-4f89-bd53-c1cb94db5a4d",
+  "id": "5979f57f-83a0-4d10-8b12-754ff135e12d",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "activeSessions": {
       "name": "activeSessions",
@@ -88,28 +88,28 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "showcase": {
           "name": "showcase",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "body_content": {
           "name": "body_content",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "gallery": {
           "name": "gallery",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "tech": {
@@ -121,19 +121,11 @@
         },
         "is_published": {
           "name": "is_published",
-          "type": "boolean",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false,
           "default": false
-        },
-        "year": {
-          "name": "year",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'2025'"
         }
       },
       "indexes": {},

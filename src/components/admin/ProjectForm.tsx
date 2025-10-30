@@ -148,6 +148,13 @@ export function ProjectForm({ project: initialProject }: Props) {
                   >
                     I
                   </Button>
+                  <Button
+                    variant="default"
+                    size="xs"
+                    onClick={() => editor.chain().focus().toggleLink().run()}
+                  >
+                    L
+                  </Button>
                   <Menu shadow="md" width={200}>
                     <Menu.Target>
                       <Button variant="default" size="xs">
@@ -227,11 +234,12 @@ export function ProjectForm({ project: initialProject }: Props) {
                 <EditorContent editor={editor} className="editor-content" />
               </Box>
             </Tabs.Panel>
-
+              
             <Tabs.Panel value="raw_content">
-              <TextInput
+              <Textarea
                 label="Raw HTML Content"
                 value={project.bodyContent}
+                autosize
                 onChange={(e) => {
                   updateField("bodyContent", e.currentTarget.value);
                   editor?.commands.setContent(e.currentTarget.value);

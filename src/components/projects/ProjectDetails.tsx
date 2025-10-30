@@ -1,10 +1,11 @@
-import { Group, Paper, SimpleGrid, Tabs, Tooltip, Image, Text, Container } from "@mantine/core";
+import { Group, Paper, SimpleGrid, Tabs, Tooltip, Image, Text, Container, Modal, Space } from "@mantine/core";
 import { PageTitle } from "../PageTitle";
 import {
   predefinedTechs,
   type Project,
 } from "../../../types";
 import { IconMessageCircle, IconPhoto } from "@tabler/icons-react";
+import { useContext, useState } from "react";
 
 type Props = {
   project: Project;
@@ -12,6 +13,9 @@ type Props = {
 
 export function ProjectDetails({ project: projectToDisplay }: Props) {
   const project = projectToDisplay;
+  const [opened, setOpened] = useState(false);
+  const [url, setUrl ] = useState('')
+  // let imageUrl = ''; 
   return (
     <>
       <PageTitle title={project.title}/>
@@ -51,6 +55,7 @@ export function ProjectDetails({ project: projectToDisplay }: Props) {
           </Tabs.List>
 
           <Tabs.Panel value="gallery">
+            <Space h="xs" />
             {project.gallery.length > 0 ? (
             <SimpleGrid cols={3} spacing="sm">
               {project.gallery.map((img) => (
@@ -59,6 +64,11 @@ export function ProjectDetails({ project: projectToDisplay }: Props) {
                   src={img.url} // should be the public URL
                   alt={img.alt || project.title}
                   radius="md"
+                  onClick={() => {
+                    setUrl(img.url.toString())
+                    console.log("Img :" + img.url + " Set URL: " + setUrl);
+                    setOpened(true);
+                  }}
                 />
               ))}
             </SimpleGrid>
@@ -72,6 +82,10 @@ export function ProjectDetails({ project: projectToDisplay }: Props) {
             {/* {project.bodyContent} */}
           </Tabs.Panel>
         </Tabs>
+
+        <Modal opened={opened} onClose={() => setOpened(false)} withCloseButton={false} size="lg">
+        <Image src={url} alt="Full Size" fit="cover"/>
+      </Modal>
       </Paper>
     </>
   );

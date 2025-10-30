@@ -1,1 +1,0 @@
-ALTER TABLE `projects` ADD `year` text DEFAULT '2025' NOT NULL;

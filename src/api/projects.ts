@@ -6,6 +6,7 @@ import type { Project } from "../../types.ts";
 const BASE_URL_API = import.meta.env.VITE_API_URL;
 
 async function secureFetch(path: string, options: RequestInit = {}) {
+  console.log(`${BASE_URL_API}${path}`);
   const response = await fetch(`${BASE_URL_API}${path}`, {
     credentials: "include",
     ...options,

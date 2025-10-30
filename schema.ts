@@ -11,15 +11,16 @@ export const projects = sqliteTable("projects", {
     .$type<GalleryImage[]>(),                               // ...content's gallery images.                         (Details)
   tech: text("tech", { mode: 'json' }).notNull()            // JSON blob containing a list of languages &           ...  
     .$type<string[]>(),                                     // ...software used on the project.                     (Details)
-  isPublished: integer("is_published", {mode: 'boolean'})   // Flag to determine if this project is
+  isPublished: integer("is_published", {mode: 'boolean'})   // Flag to determine if this project is                 (Admin Listing)
   .notNull().default(false),                                // ...shown in the public listings page.
+  // forceRebuild: text("debug_forceRebuild"),                 // Debugging column to force database rebuild.
 });
 
 export const activeSessions = sqliteTable("activeSessions", {
   session_id: text("session_id").primaryKey(),              // Set string identiries, manually generate via code    (Not shown)
   createdAt: integer("createdAt"),                          // Simple date time int, used for clearing sessions     ...
   // ...upon expiration.                                    (Not shown)
-})
+});
 
 export const projectImages = sqliteTable("projectImages", {
   id: integer("id").primaryKey({ autoIncrement: true }),    // Auto generated int identifier                        (Not shown)
