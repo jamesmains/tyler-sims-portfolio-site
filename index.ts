@@ -5,7 +5,7 @@ import { cors } from "@elysiajs/cors";
 
 // Drizzle/Database dependencies
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import { eq, lt, sql } from "drizzle-orm";
+import { and, eq, like, lt, sql } from "drizzle-orm";
 import { Database } from "bun:sqlite";
 import { projects, activeSessions, projectImages } from "./schema.ts";
 import type { Project, GalleryImage } from "./types.ts";
@@ -31,6 +31,14 @@ const UPLOADS_PATH = path.join(import.meta.dir,"/uploads");
 const dbFile = `${import.meta.dir}/db/db.sqlite`;
 let sqlite: Database;
 let db = drizzle({ schema: { projects, activeSessions, projectImages } });
+
+interface ProjectsQuery {
+    page?: string;
+    limit?: string;
+    query?: string;     // Text search term
+    tech?: string;      // Specific tech stack
+    published?: string; // Boolean flag (should be 'true' or 'false')
+}
 
 // --- UTILITY FUNCTIONS ---
 
@@ -285,39 +293,75 @@ const app = new Elysia()
 
   // --- PUBLIC PROJECT ROUTE ---
   // Anyone can access this endpoint
-  .get("/api/projects", async ({ query, set }) => {
+  .get("/api/projects", async ({ query, set }: { query: ProjectsQuery, set: any }) => {
     try {
-      // Parse pagination parameters
-      const page = parseInt(query.page ?? "1");
-      const limit = parseInt(query.limit ?? "10");
-      const offset = (page - 1) * limit;
+        // Parse pagination parameters
+        const page = parseInt(query.page ?? "1");
+        const limit = parseInt(query.limit ?? "10");
+        const offset = (page - 1) * limit;
 
-      const result = await db
-        .select()
-        .from(projects)
-        .limit(limit)
-        .offset(offset);
+        // ----------------------------------------------------
+        // 1. Construct the Dynamic WHERE Clause (The Filter Logic)
+        // ----------------------------------------------------
+        const conditions = [];
+        // 1a. Filter by Text Query (Title search)
+        if (query.query && query.query.length > 0 && query.query !== undefined) {
+            // Use 'like' for partial, case-insensitive matching on the title column
+            conditions.push(like(projects.title, `%${query.query}%`));
+        }
 
-      const countResult = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(projects);
-      const total = countResult[0]?.count ?? 0;
+        // 1b. Filter by Technology (Requires JSON parsing/special column query for tech array)
+        if (query.tech != undefined && query.tech && query.tech.length > 0) {
+          const techArray = query.tech.split(',');
+          techArray.forEach(tech => {
+            conditions.push(sql`${projects.tech} LIKE ${`%${tech}%`}`);
+          });
+        }
+        
+        // 1c. Filter by Published Status
+        // Convert the string 'true'/'false' from the query into a boolean/integer (1/0)
+        if(query.published != undefined){
+            conditions.push(eq(projects.isPublished, query.published === 'true'));
+        }
+        
+        
+        // Combine all conditions using Drizzle's 'and' utility
+        const whereClause = and(...conditions);
+        // ----------------------------------------------------
 
-      return {
-        data: result,
-        pagination: {
-          total: total,
-          page,
-          limit,
-          totalPages: Math.ceil(total / limit),
-        },
-      };
+
+        // 2. Fetch Filtered Data
+        const result = await db
+            .select()
+            .from(projects)
+            .where(whereClause) // Apply the filter!
+            .limit(limit)
+            .offset(offset);
+
+        // 3. Get Total Count (Crucial: Must also use the filter!)
+        const countResult = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(projects)
+            .where(whereClause); // Apply the filter!
+            
+        const total = countResult[0]?.count ?? 0;
+
+        // 4. Return Results
+        return {
+            data: result,
+            pagination: {
+                total: total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+            },
+        };
     } catch (error) {
-      set.status = 500;
-      console.error("DB SELECT ERROR:", error);
-      return { error: "Failed to fetch projects from the database." };
+        set.status = 500;
+        console.error("DB SELECT ERROR:", error);
+        return { error: "Failed to fetch projects from the database." };
     }
-  })
+})
 
   .get("/api/project", async ({ query, set }) => {
     try {

@@ -32,7 +32,7 @@ export function AdminBase() {
 
   return (
     <Group px="lg">
-      <p className="text-2xl font-bold">Admin Control</p>
+      <p className="text-2xl font-bold">Admin</p>
       <div style={{ marginLeft: "auto" }}>
         <AdminActionsMenu logout={handleLogout} />
       </div>

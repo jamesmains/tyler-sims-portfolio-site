@@ -11,12 +11,34 @@ import {
 import { useProjectsQuery, useDeleteProjectMutation } from "../../api/projects";
 import { notifications } from "@mantine/notifications";
 import { Link } from "@tanstack/react-router";
+import { predefinedTechs, type Project } from "../../../types";
+import { IconCheck } from "@tabler/icons-react";
+import type { FilterOptionType, FilterValues } from "../SearchFilters";
+import SearchFilters from "../SearchFilters";
 
 interface DeleteProjectModalProps {
   opened: boolean;
   onClose: () => void;
   onConfirm: () => void;
 }
+
+// ----------------------------------------------------
+// 1. Filter Configuration
+// ----------------------------------------------------
+
+const PROJECT_FILTER_OPTIONS: FilterOptionType[] = [
+  { id: 'query', label: 'Search Title', type: 'text' },
+  { id: 'tech', label: 'Technology', type: 'dropdown', options: predefinedTechs.map(o=>o.id) },
+  { id: 'published', label: 'Published Only', type: 'checkbox' }, 
+];
+
+const INITIAL_FILTERS: FilterValues = {
+  query: undefined,
+  tech: undefined, 
+  published: true,
+};
+
+const ITEMS_PER_PAGE = 9;
 
 export function DeleteProjectModal({
   opened,
@@ -41,16 +63,31 @@ export function DeleteProjectModal({
   );
 }
 
+
 export function AdminProjectsList() {
+
+  
   const [opened, setOpened] = useState(false);
   const [targetDeleteProject, setTargetDeleteProject] = useState<number | null>(
     null
   );
-  const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useProjectsQuery(page, 10);
   const deleteProject = useDeleteProjectMutation();
 
+  const [activeFilters, setActiveFilters] = useState<FilterValues>(INITIAL_FILTERS);
+  const [page, setPage] = useState(1);
+  
+  const { data, isLoading, error } = useProjectsQuery(page, ITEMS_PER_PAGE, activeFilters); 
   const projects = data?.data ?? [];
+
+    const handleFilterChange = useCallback((newFilters: FilterValues) => {
+    // Use functional update for setActiveFilters
+    setActiveFilters(newFilters);
+    
+    // Use functional update for setPage or simply set it to 1
+    // Setting to 1 is simpler and guarantees the pagination reset.
+    setPage(1); 
+    
+  }, []);
 
   const openDeleteModal = useCallback((projectId: number | undefined) => {
     if(projectId === undefined) return;
@@ -92,22 +129,28 @@ export function AdminProjectsList() {
   New Project
 </Link>
       </Group>
-
+      <SearchFilters
+        availableFilters={PROJECT_FILTER_OPTIONS}
+        initialFilters={activeFilters}
+        onFilterChange={handleFilterChange} 
+      />
       <Table highlightOnHover striped withTableBorder>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>ID</Table.Th>
             <Table.Th>Title</Table.Th>
             <Table.Th>Description</Table.Th>
+            <Table.Th>Published</Table.Th>
             <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {projects.map((project) => (
+          {projects.map((project: Project) => (
             <Table.Tr key={project.id}>
               <Table.Td>{project.id}</Table.Td>
               <Table.Td>{project.title}</Table.Td>
               <Table.Td>{project.description}</Table.Td>
+              <Table.Td>{project.isPublished && (<IconCheck size={32} />)}</Table.Td>
               <Table.Td>
                 <Group gap="xs">
                   <Link to="/projects/$projectId" params={{ projectId: String(project.id) }}>

@@ -8,7 +8,8 @@ import {
   IconBrandAndroid,
   IconBrandHtml5,
   IconBrandCpp,
-  IconBrandJavascript
+  IconBrandJavascript,
+  IconBrandDjango
 } from '@tabler/icons-react';
 
 
@@ -33,7 +34,7 @@ export type Project = {
 export type Tech = {
     id: string;                 // Internal key value (i.e. 'csharp')
     label: string;              // Display name (i.e. 'C#')
-    icon: React.ElementType;          // React component for the icon
+    icon: React.ElementType;    // React component for the icon
 }
 
 export const predefinedTechs: Tech[] = [
@@ -47,4 +48,11 @@ export const predefinedTechs: Tech[] = [
   { id: 'html5', label: 'HTML5', icon: IconBrandHtml5 },
   { id: 'cpp', label: 'C++', icon: IconBrandCpp },
   { id: 'javascript', label: 'JavaScript', icon: IconBrandJavascript },
+  { id: 'django', label: 'Django', icon: IconBrandDjango },
+];
+
+// Filters for searching from a projects listing page
+const projectFilterOptions = [
+    { id: 'query', label: 'Search Title', type: 'text'},
+    { id: 'tech', label: 'Technology', type: 'dropdown', options: predefinedTechs},
 ];

@@ -2,8 +2,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminSecretAtom } from "../state/auth";
 import { useAtom } from "jotai";
 import type { Project } from "../../types.ts";
+import type { FilterValues } from "../components/SearchFilters.tsx";
 
 const BASE_URL_API = import.meta.env.VITE_API_URL;
+
+const cleanFilters = (filters: FilterValues) => {
+  return Object.fromEntries(
+    Object.entries(filters).filter(([_, value]) => 
+      // Keep booleans (true/false)
+      (typeof value === 'boolean') || 
+      // Keep strings with content
+      (typeof value === 'string' && value.length > 0) ||
+      // Keep arrays with content
+      (Array.isArray(value) && value.length > 0)
+    )
+  );
+};
 
 async function secureFetch(path: string, options: RequestInit = {}) {
   console.log(`${BASE_URL_API}${path}`);
@@ -88,12 +102,32 @@ export interface PaginatedProjects {
   };
 }
 
-export const useProjectsQuery = (page: number, limit: number) => {
-  return useQuery<PaginatedProjects>({
-    queryKey: ["projects", page],
-    queryFn: () => fetchProjects(page, limit),
-  });
-};
+export function useProjectsQuery(page: number, limit: number, filters: FilterValues) {
+    // 1. Convert the filters object into a stable string
+    // This ensures the query key only changes when the content changes, not the object reference.
+    const stableFilterString = JSON.stringify(filters); 
+    return useQuery({
+        // 2. The queryKey now uses the stable string
+        queryKey: ['projects', page, limit, stableFilterString], 
+        
+        queryFn: async () => {
+            // Your API URL construction logic (already correctly uses filters)
+            const filterParams = new URLSearchParams(filters as Record<string, string>).toString().replaceAll("undefined","");
+            const response = await fetch(`/api/projects?page=${page}&limit=${limit}&${filterParams}`);
+            
+            // 3. Optional: Add a check to minimize redundant logging/fetches in dev mode
+            // TanStack Query handles the deduplication, but this helps the console log
+            if (response.status !== 200) {
+                 throw new Error("Failed to fetch projects");
+            }
+
+            return response.json();
+        },
+        // 4. Set a short staleTime/gcTime to allow faster cleanup if needed
+        // staleTime: 1000 * 60, // e.g., 1 minute
+        // gcTime: 1000 * 60 * 5, // e.g., 5 minutes
+    });
+}
 
 export const useProjectQuery = (id: number) =>{
   return useQuery<Project>({
