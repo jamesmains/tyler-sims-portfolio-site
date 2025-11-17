@@ -28,6 +28,7 @@ export type Project = {
     showcase: string;           // Filepath for the main image for this project
     gallery: GalleryImage[];    // Custom type that needs to be read from json upon loading
     tech: string[];             // Will be turned into a json string upon saving and read from json upon loading
+    type: string[];             // Will be turned into a json string upon saving and read from json upon loading
     isPublished: boolean;       // Determines if this project is viewable by the public projects listing page
 }
 
@@ -50,6 +51,8 @@ export const predefinedTechs: Tech[] = [
   { id: 'javascript', label: 'JavaScript', icon: IconBrandJavascript },
   { id: 'django', label: 'Django', icon: IconBrandDjango },
 ];
+
+export const predefinedProjectTypes = ["Game", "Prototype", "Web", "Playable", "In Progress", "Complete"];
 
 // Filters for searching from a projects listing page
 const projectFilterOptions = [

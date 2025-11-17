@@ -1,11 +1,11 @@
 import { Elysia, t } from "elysia";
 import path from "path";
-import fs from "fs";
+import fs, { exists } from "fs";
 import { cors } from "@elysiajs/cors";
 
 // Drizzle/Database dependencies
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import { and, eq, like, lt, sql } from "drizzle-orm";
+import { and, eq, like, lt, or, sql } from "drizzle-orm";
 import { Database } from "bun:sqlite";
 import { projects, activeSessions, projectImages } from "./schema.ts";
 import type { Project, GalleryImage } from "./types.ts";
@@ -26,18 +26,19 @@ const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 const FRONTEND_ASSETS_DIR = path.join(import.meta.dir, "/dist");
 const INDEX_HTML_PATH = path.join(FRONTEND_ASSETS_DIR, "index.html");
 const ASSETS_SUBDIR_PATH = path.join(FRONTEND_ASSETS_DIR, "/assets");
-const UPLOADS_PATH = path.join(import.meta.dir,"/uploads");
+const UPLOADS_PATH = path.join(import.meta.dir, "/uploads");
 
 const dbFile = `${import.meta.dir}/db/db.sqlite`;
 let sqlite: Database;
 let db = drizzle({ schema: { projects, activeSessions, projectImages } });
 
 interface ProjectsQuery {
-    page?: string;
-    limit?: string;
-    query?: string;     // Text search term
-    tech?: string;      // Specific tech stack
-    published?: string; // Boolean flag (should be 'true' or 'false')
+  page?: string;
+  limit?: string;
+  query?: string;     // Text search term
+  tech?: string;      // Specific tech stack
+  type?: string;      // Specific types
+  published?: string; // Boolean flag (should be 'true' or 'false')
 }
 
 // --- UTILITY FUNCTIONS ---
@@ -153,35 +154,6 @@ try {
   sqlite = new Database(dbFile);
   db = drizzle(sqlite, { schema: { projects, activeSessions, projectImages } });
 
-  // Create tables if they don't exist (using raw SQL for Bun SQLite setup)
-  // sqlite.run(
-  //   `CREATE TABLE IF NOT EXISTS projects (
-  //           id INTEGER PRIMARY KEY AUTOINCREMENT,
-  //           title TEXT,
-  //           description TEXT,
-  //           body_content TEXT, 
-  //           showcase TEXT,
-  //           gallery TEXT,
-  //           tech TEXT 
-  //       );`
-  // );
-
-  // sqlite.run(
-  //   `CREATE TABLE IF NOT EXISTS activeSessions (
-  //           session_id TEXT PRIMARY KEY,
-  //           createdAt INTEGER
-  //       );`
-  // );
-
-  // sqlite.run(
-  //   `CREATE TABLE IF NOT EXISTS projectImages (
-  //           id INTEGER PRIMARY KEY AUTOINCREMENT,
-  //           project_id INTEGER,
-  //           url TEXT,
-  //           alt TEXT
-  //         );`
-  // )
-
 } catch (e) {
   console.error("🛑 FATAL DATABASE STARTUP ERROR. CHECK PATH/PERMISSIONS:", e);
   process.exit(1);
@@ -295,73 +267,98 @@ const app = new Elysia()
   // Anyone can access this endpoint
   .get("/api/projects", async ({ query, set }: { query: ProjectsQuery, set: any }) => {
     try {
-        // Parse pagination parameters
-        const page = parseInt(query.page ?? "1");
-        const limit = parseInt(query.limit ?? "10");
-        const offset = (page - 1) * limit;
+      // Parse pagination parameters
+      const page = parseInt(query.page ?? "1");
+      const limit = parseInt(query.limit ?? "10");
+      const offset = (page - 1) * limit;
 
-        // ----------------------------------------------------
-        // 1. Construct the Dynamic WHERE Clause (The Filter Logic)
-        // ----------------------------------------------------
-        const conditions = [];
-        // 1a. Filter by Text Query (Title search)
-        if (query.query && query.query.length > 0 && query.query !== undefined) {
-            // Use 'like' for partial, case-insensitive matching on the title column
-            conditions.push(like(projects.title, `%${query.query}%`));
+      // ----------------------------------------------------
+      // 1. Construct the Dynamic WHERE Clause (The Filter Logic)
+      // ----------------------------------------------------
+      const conditions = [];
+
+      // 1a. Filter by Text Query (Title search)
+      if (query.query && query.query.length > 0) {
+        // Use 'like' for partial, case-insensitive matching on the title column
+        conditions.push(like(projects.title, `%${query.query}%`));
+      }
+
+      // 1b. Filter by Technology (OR matching)
+      if (query.tech && query.tech.length > 0) {
+        const techArray = query.tech.split(',');
+
+        // Create an array of OR conditions for technologies
+        const techConditions = techArray.map(tech => {
+          // Assuming 'tech' is stored as a comma-separated string or similar format 
+          // that benefits from LIKE %value% matching.
+          return sql`${projects.tech} LIKE ${`%${tech}%`}`;
+        });
+
+        // **Combine the tech conditions with OR** and push the resulting single clause
+        // to the main conditions array.
+        if (techConditions.length > 0) {
+          conditions.push(or(...techConditions));
         }
+      }
 
-        // 1b. Filter by Technology (Requires JSON parsing/special column query for tech array)
-        if (query.tech != undefined && query.tech && query.tech.length > 0) {
-          const techArray = query.tech.split(',');
-          techArray.forEach(tech => {
-            conditions.push(sql`${projects.tech} LIKE ${`%${tech}%`}`);
-          });
+      // 1c. Filter by Published Status
+      if (query.published != undefined) {
+        conditions.push(eq(projects.isPublished, query.published === 'true'));
+      }
+
+      // 1d. Filter by Type (OR matching)
+      if (query.type && query.type.length > 0) {
+        const typeArray = query.type.split(',');
+
+        // Create an array of OR conditions for types
+        const typeConditions = typeArray.map(type => {
+          return sql`${projects.type} LIKE ${`%${type}%`}`;
+        });
+
+        // **Combine the type conditions with OR** and push the resulting single clause
+        // to the main conditions array.
+        if (typeConditions.length > 0) {
+          conditions.push(or(...typeConditions));
         }
-        
-        // 1c. Filter by Published Status
-        // Convert the string 'true'/'false' from the query into a boolean/integer (1/0)
-        if(query.published != undefined){
-            conditions.push(eq(projects.isPublished, query.published === 'true'));
-        }
-        
-        
-        // Combine all conditions using Drizzle's 'and' utility
-        const whereClause = and(...conditions);
-        // ----------------------------------------------------
+      }
+
+      // Combine all main conditions using Drizzle's 'and' utility
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      // ----------------------------------------------------
 
 
-        // 2. Fetch Filtered Data
-        const result = await db
-            .select()
-            .from(projects)
-            .where(whereClause) // Apply the filter!
-            .limit(limit)
-            .offset(offset);
+      // 2. Fetch Filtered Data
+      const result = await db
+        .select()
+        .from(projects)
+        .where(whereClause) // Apply the filter!
+        .limit(limit)
+        .offset(offset);
 
-        // 3. Get Total Count (Crucial: Must also use the filter!)
-        const countResult = await db
-            .select({ count: sql<number>`count(*)` })
-            .from(projects)
-            .where(whereClause); // Apply the filter!
-            
-        const total = countResult[0]?.count ?? 0;
+      // 3. Get Total Count (Crucial: Must also use the filter!)
+      const countResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(projects)
+        .where(whereClause); // Apply the filter!
 
-        // 4. Return Results
-        return {
-            data: result,
-            pagination: {
-                total: total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
-            },
-        };
+      const total = countResult[0]?.count ?? 0;
+
+      // 4. Return Results
+      return {
+        data: result,
+        pagination: {
+          total: total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
     } catch (error) {
-        set.status = 500;
-        console.error("DB SELECT ERROR:", error);
-        return { error: "Failed to fetch projects from the database." };
+      set.status = 500;
+      console.error("DB SELECT ERROR:", error);
+      return { error: "Failed to fetch projects from the database." };
     }
-})
+  })
 
   .get("/api/project", async ({ query, set }) => {
     try {
@@ -410,6 +407,7 @@ const app = new Elysia()
               bodyContent: content.bodyContent, // Use the actual value from the body
               gallery: content.gallery, // Save the stringified JSON
               tech: content.tech,
+              type: content.type,
             })
             .returning();
 
@@ -438,7 +436,8 @@ const app = new Elysia()
               bodyContent: content.bodyContent, // Use the actual value from the body
               gallery: content.gallery, // Save the stringified JSON
               tech: content.tech,
-              isPublished : content.isPublished
+              type: content.type,
+              isPublished: content.isPublished
             })
             .where(eq(projects.id, content.id))
             .returning();
@@ -517,7 +516,7 @@ const app = new Elysia()
               alt: file.name,
             });
           }
-          else{
+          else {
             console.log("No project id associated when trying to add image, not making a database record");
           }
 
@@ -546,12 +545,12 @@ const app = new Elysia()
 
   // Start the server
   .listen(
-  {
-    port: Number(process.env.PORT) || 3000,
-    hostname: "0.0.0.0",
-  },
-  () => {
-    console.log("Combined Server running on " + process.env.BASE_URL);
-    setInterval(deleteExpiredSessions, CLEANUP_INTERVAL_MS);
-  }
-);
+    {
+      port: Number(process.env.PORT) || 3000,
+      hostname: "0.0.0.0",
+    },
+    () => {
+      console.log("Combined Server running on " + process.env.BASE_URL);
+      setInterval(deleteExpiredSessions, CLEANUP_INTERVAL_MS);
+    }
+  );

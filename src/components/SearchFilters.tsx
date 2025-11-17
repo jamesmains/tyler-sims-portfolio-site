@@ -7,7 +7,7 @@ import MemoizedSearchInput from './MemoizedSearchInput';
 // --- Type Definitions (Remain the same) ---
 export type FilterOptionType =
   | { id: string; label: string; type: 'text'; }
-  | { id: string; label: string; type: 'dropdown'; options: string[]; }
+  | { id: string; label: string; type: 'dropdown'; options: { value: string; label: string }[];}
   | { id: string; label: string; type: 'checkbox'; };
 
 export type FilterValues = Record<string, string | string[] | boolean | undefined>;

@@ -4,7 +4,7 @@ import { useProjectsQuery } from "../../api/projects";
 import { PageTitle } from "../PageTitle";
 import { ProjectCard } from "./ProjectCard";
 import SearchFilters, { type FilterValues, type FilterOptionType } from "../SearchFilters";
-import { predefinedTechs, type Project } from "../../../types";
+import { predefinedProjectTypes, predefinedTechs, type Project } from "../../../types";
 
 // ----------------------------------------------------
 // 1. Filter Configuration
@@ -12,13 +12,21 @@ import { predefinedTechs, type Project } from "../../../types";
 
 const PROJECT_FILTER_OPTIONS: FilterOptionType[] = [
   { id: 'query', label: 'Search Title', type: 'text' },
-  { id: 'tech', label: 'Technology', type: 'dropdown', options: predefinedTechs.map(o=>o.id) },
-  { id: 'published', label: 'Published Only', type: 'checkbox' }, 
+  { id: 'tech', label: 'Technology', type: 'dropdown', options: predefinedTechs.map(tech => ({ 
+      value: tech.id, 
+      label: tech.label 
+    }))},
+  { id: 'type', label: 'Type', type: 'dropdown', options: predefinedProjectTypes.map(type => ({
+    value: type,
+    label: type
+  }))},
+  // { id: 'published', label: 'Published Only', type: 'checkbox' }, 
 ];
 
 const INITIAL_FILTERS: FilterValues = {
   query: undefined,
-  tech: undefined, 
+  tech: undefined,
+  type: undefined, 
   published: true,
 };
 

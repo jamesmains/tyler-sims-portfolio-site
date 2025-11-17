@@ -1,5 +1,6 @@
 import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 import type { GalleryImage } from "./types";
+import { json } from 'stream/consumers';
 
 export const projects = sqliteTable("projects", {
   id: integer("id").primaryKey({ autoIncrement: true }),    // Auto generated int identifier                        (Not shown)
@@ -11,6 +12,8 @@ export const projects = sqliteTable("projects", {
     .$type<GalleryImage[]>(),                               // ...content's gallery images.                         (Details)
   tech: text("tech", { mode: 'json' }).notNull()            // JSON blob containing a list of languages &           ...  
     .$type<string[]>(),                                     // ...software used on the project.                     (Details)
+  type: text("type", {mode: 'json'}).$type<string[]>(),     // JSON blob containing a list of types the project     (Listing/Details)
+                                                            // ...falls under such as complete or game.
   isPublished: integer("is_published", {mode: 'boolean'})   // Flag to determine if this project is                 (Admin Listing)
   .notNull().default(false),                                // ...shown in the public listings page.
   // forceRebuild: text("debug_forceRebuild"),                 // Debugging column to force database rebuild.

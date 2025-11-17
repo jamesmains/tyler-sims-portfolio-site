@@ -3,6 +3,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
+  predefinedProjectTypes,
   predefinedTechs,
   type Project,
 } from "../../../types";
@@ -24,6 +25,7 @@ import {
   Tooltip,
   Space,
   Menu,
+  MultiSelect,
 } from "@mantine/core";
 import { IconFileTypeHtml, IconLetterCase } from "@tabler/icons-react";
 import { ProjectFileUpload } from "./ProjectFileUpload";
@@ -103,6 +105,16 @@ export function ProjectForm({ project: initialProject }: Props) {
           onChange={(e) => updateField("description", e.currentTarget.value)}
           minRows={2}
         />
+
+
+        <MultiSelect
+      label="Type"
+      placeholder="Pick value"
+      data={predefinedProjectTypes}
+      defaultValue={project.type}
+      onChange={(e) => updateField("type", e)}
+      clearable
+    />
 
         {/* Body Content Editor */}
         <Box>
@@ -272,6 +284,7 @@ export function ProjectForm({ project: initialProject }: Props) {
           <Space h="xs" />
           <Divider size="sm" />
           <Space h="xs" />
+          
           <Group wrap="wrap">
             {predefinedTechs.map(({ id, label, icon: Icon }) => {
               const active = project.tech?.includes(id);
