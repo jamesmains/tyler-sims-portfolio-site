@@ -111,7 +111,7 @@ export function ProjectForm({ project: initialProject }: Props) {
       label="Type"
       placeholder="Pick value"
       data={predefinedProjectTypes}
-      defaultValue={project.type}
+      defaultValue={project.type == undefined ? undefined : project.type}
       onChange={(e) => updateField("type", e)}
       clearable
     />
