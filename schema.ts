@@ -1,5 +1,5 @@
 import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
-import type { GalleryImage } from "./types";
+import type { GalleryImage, ProjectLink } from "./types";
 import { json } from 'stream/consumers';
 
 export const projects = sqliteTable("projects", {
@@ -14,6 +14,8 @@ export const projects = sqliteTable("projects", {
     .$type<string[]>(),                                     // ...software used on the project.                     (Details)
   type: text("type", {mode: 'json'}).$type<string[]>(),     // JSON blob containing a list of types the project     (Listing/Details)
                                                             // ...falls under such as complete or game.
+  links: text("links", {mode: 'json'})
+    .$type<ProjectLink[]>(),
   isPublished: integer("is_published", {mode: 'boolean'})   // Flag to determine if this project is                 (Admin Listing)
   .notNull().default(false),                                // ...shown in the public listings page.
   // forceRebuild: text("debug_forceRebuild"),                 // Debugging column to force database rebuild.

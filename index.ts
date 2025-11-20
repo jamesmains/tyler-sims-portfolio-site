@@ -408,6 +408,7 @@ const app = new Elysia()
               gallery: content.gallery, // Save the stringified JSON
               tech: content.tech,
               type: content.type,
+              links: content.links,
             })
             .returning();
 
@@ -437,6 +438,7 @@ const app = new Elysia()
               gallery: content.gallery, // Save the stringified JSON
               tech: content.tech,
               type: content.type,
+              links: content.links,
               isPublished: content.isPublished
             })
             .where(eq(projects.id, content.id))

@@ -7,6 +7,8 @@ import {
   Text,
   Group,
   Button,
+  Box,
+  useMantineTheme,
 } from "@mantine/core";
 import {
     IconArchive,
@@ -18,12 +20,16 @@ import { useDocumentTitle } from '@mantine/hooks';
 
 const HomePage = () => {
   useDocumentTitle("Home");
+  const theme = useMantineTheme();
+  const frontSrc = "/uploads/profile-pic.jpg";
+  const backText = "Testing";
+  const size = 120;
   return (
     <Container size="md" py="sm">
       <Stack
         align="center"
         justify="center"
-        style={{ minHeight: "80vh" }}
+        style={{ minHeight: "80vh", }}
       >
         {/* Avatar / Profile Picture */}
         <Avatar
@@ -31,8 +37,10 @@ const HomePage = () => {
           size={200}
           radius={120}
           alt="Profile"
+          style={{
+        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.10), 0 6px 4px rgba(0, 0, 0, 0.15)', // Example shadow
+      }}
         />
-
         {/* Name / Title */}
         <Title order={1} style={{ fontFamily: "'Rubik', sans-serif" }}>
           Tyler Sims

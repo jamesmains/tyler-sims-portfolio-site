@@ -9,7 +9,11 @@ import {
   IconBrandHtml5,
   IconBrandCpp,
   IconBrandJavascript,
-  IconBrandDjango
+  IconBrandDjango,
+  IconBrandYoutube,
+  IconBrandGithub,
+  IconBrandItch,
+  IconWorldPin,
 } from '@tabler/icons-react';
 
 
@@ -17,6 +21,11 @@ export type GalleryImage = {
     id: string;
     url: string;
     alt: string;
+}
+
+export type ProjectLink = {
+    id: string;
+    url: string;
 }
 
 export type Project = {
@@ -29,6 +38,7 @@ export type Project = {
     gallery: GalleryImage[];    // Custom type that needs to be read from json upon loading
     tech: string[];             // Will be turned into a json string upon saving and read from json upon loading
     type: string[];             // Will be turned into a json string upon saving and read from json upon loading
+    links: ProjectLink[];       // External links related to the project
     isPublished: boolean;       // Determines if this project is viewable by the public projects listing page
 }
 
@@ -53,6 +63,23 @@ export const predefinedTechs: Tech[] = [
 ];
 
 export const predefinedProjectTypes = ["Game", "Prototype", "Web", "Playable", "In Progress", "Complete"];
+
+export type ExternalLink = {
+    id: string;                 // Internal key value (i.e. 'youtube')
+    label: string;              // Display action text (i.e. 'Watch')
+    name: string;               // For ease of Admin use (i.e. 'YouTube')
+    tooltip: string;            // Tooltip display text (i.e. 'Watch on YouTube')
+    icon: React.ElementType;    // React component for the icon
+}
+export const prefedinedProjectExternalLinks: ExternalLink[] = [
+  {id: 'youtube', label:'Watch', name:'YouTube', tooltip:'Watch on YouTube', icon: IconBrandYoutube},
+  {id: 'github', label:'Source', name:'GitHub', tooltip:'View source code on GitHub', icon: IconBrandGithub},  
+  {id: 'itch_play', label:'Play', name:'Itch.io (Play)',
+     tooltip:'Play on Itch.io', icon:IconBrandItch},                  // Should be the target itch link
+  {id: 'itch_download', label:'Download', name:'Itch.io (Download)',
+     tooltip:'Download on Itch.io', icon:IconBrandItch},              // Backup if play in browser is not an option
+  {id: 'other', label:'View', name:'External Page (View)', tooltip:'View external content', icon: IconWorldPin},  
+];
 
 // Filters for searching from a projects listing page
 const projectFilterOptions = [

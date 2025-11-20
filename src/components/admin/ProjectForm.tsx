@@ -30,6 +30,7 @@ import {
 import { IconFileTypeHtml, IconLetterCase } from "@tabler/icons-react";
 import { ProjectFileUpload } from "./ProjectFileUpload";
 import { check } from "drizzle-orm/gel-core";
+import { ProjectLinksManager } from "./ProjectLinksManager";
 
 type Props = {
   project: Project;
@@ -275,6 +276,20 @@ export function ProjectForm({ project: initialProject }: Props) {
           fieldName="gallery"
           maxImages={10}
         />
+<Box>
+  <Space h="xs" />
+          <Title order={4} className="mb-2">
+            External Links
+          </Title>
+          <Space h="xs" />
+          <Divider size="sm" />
+          <Space h="xs" />
+          <ProjectLinksManager
+    links={project.links || []} // Pass the current links array
+    updateField={(key, value) => updateField(key, value)} // Pass the updater function
+/>
+</Box>
+
         {/* Tech Selection */}
         <Box>
           <Space h="xs" />

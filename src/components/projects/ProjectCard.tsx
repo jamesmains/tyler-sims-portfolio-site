@@ -1,4 +1,4 @@
-import { Box, Card, Group, Image, Pill, Text, Tooltip, Transition } from "@mantine/core";
+import { Anchor, Box, Card, Group, Image, Pill, Text, Tooltip, Transition } from "@mantine/core";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { predefinedProjectTypes, predefinedTechs, type Project } from "../../../types";
@@ -7,11 +7,7 @@ export function ProjectCard({ project }: { project: Project }) {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <Link
-      to="/projects/$projectId"
-      params={{ projectId: String(project.id) }}
-      style={{ textDecoration: "none" }}
-    >
+    
       <Card
         padding={0}
         withBorder
@@ -27,6 +23,11 @@ export function ProjectCard({ project }: { project: Project }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
+        <Link
+      to="/projects/$projectId"
+      params={{ projectId: String(project.id) }}
+      style={{ textDecoration: "none" }}
+    >
         <Image
           src={project.showcase || "/placeholder.jpg"}
           alt={project.title}
@@ -100,10 +101,11 @@ export function ProjectCard({ project }: { project: Project }) {
                       })}
                     </Group>
               </Box>
+
             </div>
           )}
         </Transition>
-      </Card>
     </Link>
+      </Card>
   );
 }

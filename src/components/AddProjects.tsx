@@ -18,6 +18,8 @@ export function AddProject({visible}:{visible:boolean}) {
             showcase: '',
             gallery: [],
             tech: [],
+            type: [],
+            links: [],
         }
         
         mutation.mutate(project);
