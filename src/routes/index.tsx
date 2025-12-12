@@ -29,7 +29,7 @@ const HomePage = () => {
       >
         {/* Avatar / Profile Picture */}
         <Avatar
-          src="/assets/profile-pic.png"
+          src="../assets/profile-pic.png"
           size={300}
           h={200}
           radius={40}
