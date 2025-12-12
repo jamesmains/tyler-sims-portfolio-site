@@ -154,5 +154,3 @@ bun run type-check
 ```
 - Add Drizzle migrations when changing schema.
 
-## License
-Specify project license here (e.g. MIT). Update LICENSE file as appropriate.
