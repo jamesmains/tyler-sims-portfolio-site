@@ -35,7 +35,7 @@ const PROJECT_FILTER_OPTIONS: FilterOptionType[] = [
 const INITIAL_FILTERS: FilterValues = {
   query: undefined,
   tech: undefined, 
-  published: true,
+  published: undefined,
 };
 
 const ITEMS_PER_PAGE = 9;

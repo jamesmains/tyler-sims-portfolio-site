@@ -20,10 +20,6 @@ import { useDocumentTitle } from '@mantine/hooks';
 
 const HomePage = () => {
   useDocumentTitle("Home");
-  const theme = useMantineTheme();
-  const frontSrc = "/uploads/profile-pic.jpg";
-  const backText = "Testing";
-  const size = 120;
   return (
     <Container size="md" py="sm">
       <Stack
@@ -33,9 +29,10 @@ const HomePage = () => {
       >
         {/* Avatar / Profile Picture */}
         <Avatar
-          src="/uploads/profile-pic.jpg"
-          size={200}
-          radius={120}
+          src="/assets/profile-pic.png"
+          size={300}
+          h={200}
+          radius={40}
           alt="Profile"
           style={{
         boxShadow: '0 6px 8px rgba(0, 0, 0, 0.10), 0 6px 4px rgba(0, 0, 0, 0.15)', // Example shadow
